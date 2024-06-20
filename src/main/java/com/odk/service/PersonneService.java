@@ -1,6 +1,7 @@
 package com.odk.service;
 
 import com.odk.entity.Personne;
+import com.odk.enums.TypeRole;
 import com.odk.repository.PersonneRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +24,39 @@ public class PersonneService {
         }
     }
 
+    //Creation d'un formateur
+    public void createFormateur(Personne formateur){
+        if (formateur.getRole() == TypeRole.Formateur) {
+            Personne existingPerson = this.personneRepository.findByEmail(formateur.getEmail());
+            if(existingPerson == null){
+                this.personneRepository.save(formateur);
+            }
+        } else {
+            throw new IllegalArgumentException("Le rôle de la personne doit être Formateur");
+        }
+    }
+
+    //Creation d'un apprenant
+    public void createApprenant(Personne apprenant){
+        if (apprenant.getRole() == TypeRole.Apprenant) {
+            Personne existingPerson = this.personneRepository.findByEmail(apprenant.getEmail());
+            if(existingPerson == null){
+                this.personneRepository.save(apprenant);
+            }
+        } else {
+            throw new IllegalArgumentException("Le rôle de la personne doit être APPRENANT");
+        }
+    }
+
+
     public List<Personne> chercher(){
         return this.personneRepository.findAll();
     }
 
     public Personne lire(Integer id) {
-        Optional<Personne> optionalClient = this.personneRepository.findById(id);
+        Optional<Personne> optionalPersonne = this.personneRepository.findById(id);
         //Verfication pour savoir si client existe ou pas
-        return optionalClient.orElse(null);
+        return optionalPersonne.orElse(null);
     }
     public Personne lireouCreer(Personne personneAceer){
         Personne personneDansLaBBD = this.personneRepository.findByEmail(personneAceer.getEmail());

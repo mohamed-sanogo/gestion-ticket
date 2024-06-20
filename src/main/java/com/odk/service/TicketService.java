@@ -3,6 +3,7 @@ package com.odk.service;
 import com.odk.entity.Personne;
 import com.odk.entity.Ticket;
 import com.odk.enums.TypePriorite;
+import com.odk.enums.TypeStatut;
 import com.odk.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,20 @@ public class TicketService {
         this.personneService = personneService;
     }
 
+    //Modifier le statut du ticket
+    public void updateTicketStatut(Integer id, TypeStatut statut) {
+        Ticket ticket = this.ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket non trouvé"));
+        ticket.setStatut(statut);
+        this.ticketRepository.save(ticket);
+    }
 
-
+    //Reponse a un ticket
+    public void repondreAuTicket(Integer id, String reponse) {
+        Ticket ticket = this.ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket non trouvé"));
+        // Logique pour ajouter la réponse (peut-être dans un champ `reponse` que tu devrais ajouter à l'entité Ticket)
+        ticket.setStatut(TypeStatut.Terminer);
+        this.ticketRepository.save(ticket);
+    }
 
     public void createTicket(Ticket ticket){
         Personne personne = this.personneService.lireouCreer(ticket.getPersonne());
