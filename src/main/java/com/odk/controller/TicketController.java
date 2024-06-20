@@ -25,7 +25,7 @@ public class TicketController {
     public void createTicket(@RequestBody Ticket ticket){
         //Analyse
         ticket.setPriorite(TypePriorite.Urgent);
-        if(ticket.getNom().contains("pas")){
+        if(ticket.getTitre().contains("pas")){
             ticket.setPriorite(TypePriorite.MoinsUrgent);
         }
         this.ticketService.createTicket(ticket);

@@ -1,23 +1,26 @@
 package com.odk.entity;
 
+import com.odk.enums.TypeRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="Client")
+@Table(name="personne")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Client {
+public class Personne {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idClient;
+    private Integer id;
 
-    private String nomClient;
-    private String prenomClient;
+    private String nom;
+    private String prenom;
     @Column(unique = true)
     private String email;
+    private String mdp;
+    private TypeRole role;
 
 }

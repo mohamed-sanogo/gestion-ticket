@@ -1,56 +1,54 @@
 package com.odk.service;
 
-import com.fasterxml.jackson.core.PrettyPrinter;
-import com.odk.entity.Client;
-import com.odk.repository.ClientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.client.ClientHttpRequest;
+import com.odk.entity.Personne;
+import com.odk.repository.PersonneRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ClientService {
-    private ClientRepository clientRepository;
+public class PersonneService {
+    private PersonneRepository personneRepository;
 
-    public ClientService(ClientRepository clientRepository) {
-        this.clientRepository = clientRepository;
+    public PersonneService(PersonneRepository personneRepository) {
+        this.personneRepository = personneRepository;
     }
 
 
-    public void createClient(Client client){
-        Client clientDansLaBBD = this.clientRepository.findByEmail(client.getEmail());
-        if(clientDansLaBBD == null){
-            this.clientRepository.save(client);
+    public void createPersonne(Personne personne){
+        Personne personneDansLaBBD = this.personneRepository.findByEmail(personne.getEmail());
+        if(personneDansLaBBD == null){
+            this.personneRepository.save(personne);
         }
     }
 
-    public List<Client> chercher(){
-        return this.clientRepository.findAll();
+    public List<Personne> chercher(){
+        return this.personneRepository.findAll();
     }
 
-    public Client lire(Integer id) {
-        Optional<Client> optionalClient = this.clientRepository.findById(id);
+    public Personne lire(Integer id) {
+        Optional<Personne> optionalClient = this.personneRepository.findById(id);
         //Verfication pour savoir si client existe ou pas
         return optionalClient.orElse(null);
     }
-    public Client lireouCreer(Client clientAceer){
-        Client clientDansLaBBD = this.clientRepository.findByEmail(clientAceer.getEmail());
-        if(clientDansLaBBD == null){
-            this.clientRepository.save(clientAceer);
+    public Personne lireouCreer(Personne personneAceer){
+        Personne personneDansLaBBD = this.personneRepository.findByEmail(personneAceer.getEmail());
+        if(personneDansLaBBD == null){
+            this.personneRepository.save(personneAceer);
         }
-        return clientDansLaBBD;
+        return personneDansLaBBD;
     }
 
-    public void updateClient(Integer id, Client client) {
-       Client leClientDanasLaBdd = this.lire(id);
-       if(leClientDanasLaBdd.getIdClient() == client.getIdClient()){
-           leClientDanasLaBdd.setPrenomClient(client.getPrenomClient());
-           leClientDanasLaBdd.setNomClient(client.getNomClient());
-           this.clientRepository.save(leClientDanasLaBdd);
+    public void updatePersonne(Integer id, Personne personne) {
+       Personne lePersonneDanasLaBdd = this.lire(id);
+       if(lePersonneDanasLaBdd.getId() == personne.getId()){
+           lePersonneDanasLaBdd.setPrenom(personne.getPrenom());
+           lePersonneDanasLaBdd.setNom(personne.getNom());
+           lePersonneDanasLaBdd.setEmail(personne.getEmail());
+           lePersonneDanasLaBdd.setMdp(personne.getMdp());
+           lePersonneDanasLaBdd.setRole(personne.getRole());
+           this.personneRepository.save(lePersonneDanasLaBdd);
        }
 
     }

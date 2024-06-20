@@ -1,6 +1,6 @@
 package com.odk.service;
 
-import com.odk.entity.Client;
+import com.odk.entity.Personne;
 import com.odk.entity.Ticket;
 import com.odk.enums.TypePriorite;
 import com.odk.repository.TicketRepository;
@@ -12,19 +12,19 @@ import java.util.List;
 public class TicketService {
 
     private TicketRepository ticketRepository;
-    private ClientService clientService;
+    private PersonneService personneService;
 
-    public TicketService(TicketRepository ticketRepository, ClientService clientService) {
+    public TicketService(TicketRepository ticketRepository, PersonneService personneService) {
         this.ticketRepository = ticketRepository;
-        this.clientService = clientService;
+        this.personneService = personneService;
     }
 
 
 
 
     public void createTicket(Ticket ticket){
-        Client client = this.clientService.lireouCreer(ticket.getClient());
-        ticket.setClient(client);
+        Personne personne = this.personneService.lireouCreer(ticket.getPersonne());
+        ticket.setPersonne(personne);
         this.ticketRepository.save(ticket);
     }
 
