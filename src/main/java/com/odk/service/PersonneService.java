@@ -3,6 +3,11 @@ package com.odk.service;
 import com.odk.entity.Personne;
 import com.odk.enums.TypeRole;
 import com.odk.repository.PersonneRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,10 +16,49 @@ import java.util.Optional;
 @Service
 public class PersonneService {
     private PersonneRepository personneRepository;
+    private PasswordEncoder passwordEncoder;
 
-    public PersonneService(PersonneRepository personneRepository) {
+    public PersonneService(PersonneRepository personneRepository, PasswordEncoder passwordEncoder) {
         this.personneRepository = personneRepository;
+        this.passwordEncoder = passwordEncoder;
     }
+
+    //Gestion de l'authefication
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Personne personne = personneRepository.findByEmail(email);
+        if (personne == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return new org.springframework.security.core.userdetails.User(
+                personne.getEmail(),
+                personne.getMdp(),
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + personne.getRole()))
+        );
+    }
+
+    public Personne save(Personne personne) {
+        personne.setMdp(passwordEncoder.encode(personne.getMdp()));
+        return personneRepository.save(personne);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     public void createPersonne(Personne personne){
