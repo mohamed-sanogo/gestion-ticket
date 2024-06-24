@@ -1,71 +1,49 @@
 package com.odk.controller;
 
+import com.odk.config.JwtService;
+import com.odk.dto.AuthenticationDTO;
 import com.odk.entity.Personne;
 import com.odk.enums.TypeRole;
 import com.odk.service.PersonneService;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+@AllArgsConstructor
 @RestController
-@RequestMapping(path = "personne")
+@Slf4j
 public class PersonneController {
     private PersonneService personneService;
-    public PersonneController(PersonneService personneService) {
-        this.personneService = personneService;
+    private AuthenticationManager authenticationManager;
+    private JwtService jwtService;
+
+    @PostMapping(path = "inscription", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void inscription(@RequestBody Personne personne){
+        this.personneService.inscription(personne);
+        log.info("inscription");
     }
 
-    //Controller pour créér un Formateur
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path = "/formateur", consumes = APPLICATION_JSON_VALUE)
-    public void createFormateur(@RequestBody Personne formateur, @RequestHeader("Role") String role){
-        if(TypeRole.Admin.name().equals(role)){
-            formateur.setRole(TypeRole.Formateur);
-            this.personneService.createFormateur(formateur);
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seul un ADMIN peut créer un formateur");
+    @PostMapping(path = "connexion")
+    public Map<String, String> connexion(@RequestBody AuthenticationDTO authenticationDTO){
+        final Authentication authenticate = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authenticationDTO.username(), authenticationDTO.password())
+        );
+        if (authenticate.isAuthenticated()){
+            return this.jwtService.generate(authenticationDTO.username());
         }
-    }
-
-    //Controller pour créér un Apprenant
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path = "/apprenant", consumes = APPLICATION_JSON_VALUE)
-    public void createApprenant(@RequestBody Personne apprenant, @RequestHeader("Role") String role){
-        if(TypeRole.Formateur.name().equals(role)){
-            apprenant.setRole(TypeRole.Apprenant);
-            this.personneService.createApprenant(apprenant);
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seul un FORMATEUR peut créer un apprenant");
-        }
-    }
-
-
-    @ResponseStatus(value = HttpStatus.CREATED)
-    @PostMapping(consumes = APPLICATION_JSON_VALUE)
-    public void createPersonne(@RequestBody Personne personne){
-        this.personneService.createPersonne(personne);
-
-    }
-
-    @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public List<Personne> rechercher(){
-       return this.personneService.chercher();
-    }
-    @GetMapping(path="{id}", produces = APPLICATION_JSON_VALUE)
-    public Personne lire(@PathVariable Integer id){
-       return this.personneService.lire(id);
-    }
-
-    @ResponseStatus(NO_CONTENT)
-    @PutMapping(path = ("{id}"), consumes = APPLICATION_JSON_VALUE)
-    public void updateClient(@PathVariable Integer id, @RequestBody Personne personne){
-        this.personneService.updatePersonne(id, personne);
-
+        return null;
     }
 
 }

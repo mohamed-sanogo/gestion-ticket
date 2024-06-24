@@ -35,11 +35,11 @@ public class TicketService {
         this.ticketRepository.save(ticket);
     }
 
-    public void createTicket(Ticket ticket){
-        Personne personne = this.personneService.lireouCreer(ticket.getPersonne());
-        ticket.setPersonne(personne);
-        this.ticketRepository.save(ticket);
-    }
+//    public void createTicket(Ticket ticket){
+//        Personne personne = this.personneService.lireouCreer(ticket.getPersonne());
+//        ticket.setPersonne(personne);
+//        this.ticketRepository.save(ticket);
+//    }
 
     public List<Ticket> chercher(TypePriorite type) {
         if(type == null){
@@ -52,5 +52,9 @@ public class TicketService {
 
     public void delete(Integer id) {
         this.ticketRepository.deleteById(id);
+    }
+
+    public void createTicket(Ticket ticket) {
+        this.ticketRepository.save(ticket);
     }
 }

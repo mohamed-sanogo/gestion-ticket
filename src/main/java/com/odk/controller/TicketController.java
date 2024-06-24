@@ -37,7 +37,7 @@ public class TicketController {
     //Mise a jour du ticket
     @PutMapping(path = "/{id}/statut", consumes = APPLICATION_JSON_VALUE)
     public void updateTicketStatut(@PathVariable Integer id, @RequestBody TypeStatut statut, @RequestHeader("Role") String role){
-        if(TypeRole.Apprenant.name().equals(role)){
+        if(TypeRole.APPRENANT.name().equals(role)){
             this.ticketService.updateTicketStatut(id, statut);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seul un APPRENANT peut mettre à jour le statut du ticket");
@@ -47,7 +47,7 @@ public class TicketController {
     //Reponse a un ticket
     @PutMapping(path = "/{id}/repondre", consumes = APPLICATION_JSON_VALUE)
     public void repondreAuTicket(@PathVariable Integer id, @RequestBody String reponse, @RequestHeader("Role") String role){
-        if(TypeRole.Formateur.name().equals(role)){
+        if(TypeRole.FORMATEUR.name().equals(role)){
             this.ticketService.repondreAuTicket(id, reponse);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seul un FORMATEUR peut répondre au ticket");
