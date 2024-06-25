@@ -1,2 +1,4 @@
-package com.odk.config;public class OpenAPIConfig {
+package com.odk.config;
+
+public class OpenAPIConfig {
 }

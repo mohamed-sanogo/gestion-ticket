@@ -1,113 +1,179 @@
 package com.odk.service;
 
 import com.odk.entity.Personne;
+import com.odk.entity.Role;
 import com.odk.enums.TypeRole;
 import com.odk.repository.PersonneRepository;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import com.odk.repository.RoleRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class PersonneService {
+@Slf4j
+public class PersonneService implements UserDetailsService {
     private PersonneRepository personneRepository;
-    private PasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public PersonneService(PersonneRepository personneRepository, PasswordEncoder passwordEncoder) {
+    private RoleRepository roleRepository;
+
+    public PersonneService(PersonneRepository personneRepository, BCryptPasswordEncoder bCryptPasswordEncoder, RoleRepository roleRepository) {
         this.personneRepository = personneRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.roleRepository = roleRepository;
     }
 
-    //Gestion de l'authefication
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Personne personne = personneRepository.findByEmail(email);
-        if (personne == null) {
-            throw new UsernameNotFoundException("User not found");
+    private void validateEmail(String email) {
+        if (!email.contains("@") || !email.contains(".")) {
+            throw new RuntimeException("Votre email est invalide");
         }
-
-        return new org.springframework.security.core.userdetails.User(
-                personne.getEmail(),
-                personne.getMdp(),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + personne.getRole()))
-        );
     }
 
-    public Personne save(Personne personne) {
-        personne.setMdp(passwordEncoder.encode(personne.getMdp()));
+    private void checkIfEmailExists(String email) {
+        if (personneRepository.findByEmail(email).isPresent()) {
+            throw new RuntimeException("Votre email est déjà utilisé");
+        }
+    }
+
+    public Role getOrCreateRole(TypeRole roleType) {
+        return roleRepository.findByRole(roleType).orElseGet(() -> {
+            Role newRole = new Role();
+            newRole.setRole(roleType);
+            return roleRepository.save(newRole);
+        });
+    }
+
+    private Personne createPersonne(Personne personne, TypeRole roleType) {
+        validateEmail(personne.getEmail());
+        checkIfEmailExists(personne.getEmail());
+        personne.setMdp(bCryptPasswordEncoder.encode(personne.getMdp()));
+        personne.setRole(getOrCreateRole(roleType));
         return personneRepository.save(personne);
     }
 
+    public void createAdmin(Personne admin) {
+        createPersonne(admin, TypeRole.Admin);
+    }
 
+    public void createFormateur(Personne formateur) {
+        createPersonne(formateur, TypeRole.Formateur);
+    }
 
+    public void createApprenant(Personne apprenant) {
+        createPersonne(apprenant, TypeRole.Apprenant);
+    }
 
+    //Sur toutes les personnes
+    public List<Personne> getAllPersonnes() {
+        return personneRepository.findAll();
+    }
 
+    public Personne getPersonneById(Integer id) {
+        return personneRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Personne non trouvée"));
+    }
 
-
-    public void createPersonne(Personne personne){
-        Personne personneDansLaBBD = this.personneRepository.findByEmail(personne.getEmail());
-        if(personneDansLaBBD == null){
-            this.personneRepository.save(personne);
+    public void deletePersonne(Integer id) {
+        if (!personneRepository.existsById(id)) {
+            throw new RuntimeException("Personne non trouvée");
         }
+        personneRepository.deleteById(id);
     }
 
-    //Creation d'un formateur
-    public void createFormateur(Personne formateur){
-        if (formateur.getRole() == TypeRole.Formateur) {
-            Personne existingPerson = this.personneRepository.findByEmail(formateur.getEmail());
-            if(existingPerson == null){
-                this.personneRepository.save(formateur);
-            }
-        } else {
-            throw new IllegalArgumentException("Le rôle de la personne doit être Formateur");
+
+    // CRUD methods for Admins
+    public List<Personne> getAllAdmins() {
+        return personneRepository.findByRole(getOrCreateRole(TypeRole.Admin));
+    }
+
+    public Personne getAdminById(Integer id) {
+        return personneRepository.findByIdAndRole(id, getOrCreateRole(TypeRole.Admin))
+                .orElseThrow(() -> new RuntimeException("Admin non trouvé"));
+    }
+
+    public Personne updateAdmin(Integer id, Personne updatedPersonne) {
+        return updatePersonneByRole(id, updatedPersonne, TypeRole.Admin);
+    }
+
+    public void deleteAdmin(Integer id) {
+        deletePersonneByRole(id, TypeRole.Admin);
+    }
+
+    // CRUD methods for Formateurs
+    public List<Personne> getAllFormateurs() {
+        return personneRepository.findByRole(getOrCreateRole(TypeRole.Formateur));
+    }
+
+    public Personne getFormateurById(Integer id) {
+        return personneRepository.findByIdAndRole(id, getOrCreateRole(TypeRole.Formateur))
+                .orElseThrow(() -> new RuntimeException("Formateur non trouvé"));
+    }
+
+    public Personne updateFormateur(Integer id, Personne updatedPersonne) {
+        return updatePersonneByRole(id, updatedPersonne, TypeRole.Formateur);
+    }
+
+    public void deleteFormateur(Integer id) {
+        deletePersonneByRole(id, TypeRole.Formateur);
+    }
+
+    // CRUD methods for Apprenants
+    public List<Personne> getAllApprenants() {
+        return personneRepository.findByRole(getOrCreateRole(TypeRole.Apprenant));
+    }
+
+    public Personne getApprenantById(Integer id) {
+        return personneRepository.findByIdAndRole(id, getOrCreateRole(TypeRole.Apprenant))
+                .orElseThrow(() -> new RuntimeException("Apprenant non trouvé"));
+    }
+
+    public Personne updateApprenant(Integer id, Personne updatedPersonne) {
+        return updatePersonneByRole(id, updatedPersonne, TypeRole.Apprenant);
+    }
+
+    public void deleteApprenant(Integer id) {
+        deletePersonneByRole(id, TypeRole.Apprenant);
+    }
+
+    // Fonction de mise a jour par role
+    private Personne updatePersonneByRole(Integer id, Personne updatedPersonne, TypeRole roleType) {
+        Personne existingPersonne = personneRepository.findByIdAndRole(id, getOrCreateRole(roleType))
+                .orElseThrow(() -> new RuntimeException(roleType + " non trouvé"));
+
+        if (!existingPersonne.getEmail().equals(updatedPersonne.getEmail())) {
+            checkIfEmailExists(updatedPersonne.getEmail());
         }
-    }
 
-    //Creation d'un apprenant
-    public void createApprenant(Personne apprenant){
-        if (apprenant.getRole() == TypeRole.Apprenant) {
-            Personne existingPerson = this.personneRepository.findByEmail(apprenant.getEmail());
-            if(existingPerson == null){
-                this.personneRepository.save(apprenant);
-            }
-        } else {
-            throw new IllegalArgumentException("Le rôle de la personne doit être APPRENANT");
+        existingPersonne.setNom(updatedPersonne.getNom());
+        existingPersonne.setPrenom(updatedPersonne.getPrenom());
+        existingPersonne.setEmail(updatedPersonne.getEmail());
+
+        if (!updatedPersonne.getMdp().isEmpty()) {
+            existingPersonne.setMdp(bCryptPasswordEncoder.encode(updatedPersonne.getMdp()));
         }
+
+        existingPersonne.setActif(updatedPersonne.getActif());
+        existingPersonne.setRole(getOrCreateRole(roleType));
+
+        return personneRepository.save(existingPersonne);
     }
 
-
-    public List<Personne> chercher(){
-        return this.personneRepository.findAll();
+    private void deletePersonneByRole(Integer id, TypeRole roleType) {
+        Personne personne = personneRepository.findByIdAndRole(id, getOrCreateRole(roleType))
+                .orElseThrow(() -> new RuntimeException(roleType + " non trouvé"));
+        personneRepository.delete(personne);
     }
 
-    public Personne lire(Integer id) {
-        Optional<Personne> optionalPersonne = this.personneRepository.findById(id);
-        //Verfication pour savoir si client existe ou pas
-        return optionalPersonne.orElse(null);
-    }
-    public Personne lireouCreer(Personne personneAceer){
-        Personne personneDansLaBBD = this.personneRepository.findByEmail(personneAceer.getEmail());
-        if(personneDansLaBBD == null){
-            this.personneRepository.save(personneAceer);
-        }
-        return personneDansLaBBD;
-    }
-
-    public void updatePersonne(Integer id, Personne personne) {
-       Personne lePersonneDanasLaBdd = this.lire(id);
-       if(lePersonneDanasLaBdd.getId() == personne.getId()){
-           lePersonneDanasLaBdd.setPrenom(personne.getPrenom());
-           lePersonneDanasLaBdd.setNom(personne.getNom());
-           lePersonneDanasLaBdd.setEmail(personne.getEmail());
-           lePersonneDanasLaBdd.setMdp(personne.getMdp());
-           lePersonneDanasLaBdd.setRole(personne.getRole());
-           this.personneRepository.save(lePersonneDanasLaBdd);
-       }
-
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return this.personneRepository
+                .findByEmail(username)
+                .orElseThrow( ()-> new UsernameNotFoundException("Utilisateur indisponible"));
     }
 }

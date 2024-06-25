@@ -13,59 +13,68 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(path = "personne")
+@RequestMapping
 public class PersonneController {
     private PersonneService personneService;
     public PersonneController(PersonneService personneService) {
         this.personneService = personneService;
     }
 
-    //Controller pour créér un Formateur
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path = "/formateur", consumes = APPLICATION_JSON_VALUE)
-    public void createFormateur(@RequestBody Personne formateur, @RequestHeader("Role") String role){
-        if(TypeRole.Admin.name().equals(role)){
-            formateur.setRole(TypeRole.Formateur);
-            this.personneService.createFormateur(formateur);
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seul un ADMIN peut créer un formateur");
-        }
+    // Controller pour Personnes
+    @GetMapping(path = "personne")
+    public List<Personne> getAllPersonnes() {
+        return personneService.getAllPersonnes();
     }
-
-    //Controller pour créér un Apprenant
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path = "/apprenant", consumes = APPLICATION_JSON_VALUE)
-    public void createApprenant(@RequestBody Personne apprenant, @RequestHeader("Role") String role){
-        if(TypeRole.Formateur.name().equals(role)){
-            apprenant.setRole(TypeRole.Apprenant);
-            this.personneService.createApprenant(apprenant);
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seul un FORMATEUR peut créer un apprenant");
-        }
-    }
-
-
-    @ResponseStatus(value = HttpStatus.CREATED)
-    @PostMapping(consumes = APPLICATION_JSON_VALUE)
-    public void createPersonne(@RequestBody Personne personne){
-        this.personneService.createPersonne(personne);
-
-    }
-
-    @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public List<Personne> rechercher(){
-       return this.personneService.chercher();
-    }
-    @GetMapping(path="{id}", produces = APPLICATION_JSON_VALUE)
-    public Personne lire(@PathVariable Integer id){
-       return this.personneService.lire(id);
+    @GetMapping("/personne/{id}")
+    public Personne getPersonneById(@PathVariable Integer id) {
+        return personneService.getPersonneById(id);
     }
 
     @ResponseStatus(NO_CONTENT)
-    @PutMapping(path = ("{id}"), consumes = APPLICATION_JSON_VALUE)
-    public void updateClient(@PathVariable Integer id, @RequestBody Personne personne){
-        this.personneService.updatePersonne(id, personne);
-
+    @DeleteMapping("/personne/{id}")
+    public void deletePersonne(@PathVariable Integer id) {
+        personneService.deletePersonne(id);
     }
+
+
+    //Controller pour Admin
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(path = "/admin", consumes = APPLICATION_JSON_VALUE)
+    public void createAdmin(@RequestBody Personne admin){
+            this.personneService.createAdmin(admin);
+    }
+
+    @PutMapping(path = "/admin/{id}", consumes = APPLICATION_JSON_VALUE)
+    public Personne updateAdmin(@PathVariable Integer id, @RequestBody Personne admin) {
+        admin.setRole(personneService.getOrCreateRole(TypeRole.Admin));
+        return personneService.updateAdmin(id, admin);
+    }
+
+    //Controller pour Formateur
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(path = "/formateur", consumes = APPLICATION_JSON_VALUE)
+    public void createFormateur(@RequestBody Personne formateur){
+        this.personneService.createFormateur(formateur);
+    }
+
+    @PutMapping(path = "/formateur/{id}", consumes = APPLICATION_JSON_VALUE)
+    public Personne updateFormateur(@PathVariable Integer id, @RequestBody Personne formateur) {
+        formateur.setRole(personneService.getOrCreateRole(TypeRole.Formateur));
+        return personneService.updateFormateur(id, formateur);
+    }
+
+    //Controller pour Apprenant
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(path = "/Apprenant", consumes = APPLICATION_JSON_VALUE)
+    public void createApprenant(@RequestBody Personne apprenant){
+        this.personneService.createApprenant(apprenant);
+    }
+
+    @PutMapping(path = "/apprenant/{id}", consumes = APPLICATION_JSON_VALUE)
+    public Personne updateApprenant(@PathVariable Integer id, @RequestBody Personne apprenant) {
+        apprenant.setRole(personneService.getOrCreateRole(TypeRole.Apprenant));
+        return personneService.updateApprenant(id, apprenant);
+    }
+
 
 }

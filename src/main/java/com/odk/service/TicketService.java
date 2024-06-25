@@ -13,11 +13,8 @@ import java.util.List;
 public class TicketService {
 
     private TicketRepository ticketRepository;
-    private PersonneService personneService;
-
     public TicketService(TicketRepository ticketRepository, PersonneService personneService) {
         this.ticketRepository = ticketRepository;
-        this.personneService = personneService;
     }
 
     //Modifier le statut du ticket
@@ -35,11 +32,6 @@ public class TicketService {
         this.ticketRepository.save(ticket);
     }
 
-    public void createTicket(Ticket ticket){
-        Personne personne = this.personneService.lireouCreer(ticket.getPersonne());
-        ticket.setPersonne(personne);
-        this.ticketRepository.save(ticket);
-    }
 
     public List<Ticket> chercher(TypePriorite type) {
         if(type == null){
