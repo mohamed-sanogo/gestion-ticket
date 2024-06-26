@@ -8,6 +8,7 @@ import com.odk.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TicketService {
@@ -17,32 +18,26 @@ public class TicketService {
         this.ticketRepository = ticketRepository;
     }
 
-    //Modifier le statut du ticket
-    public void updateTicketStatut(Integer id, TypeStatut statut) {
-        Ticket ticket = this.ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket non trouvé"));
-        ticket.setStatut(statut);
-        this.ticketRepository.save(ticket);
+
+    public Ticket createTicket(Ticket ticket) {
+        ticket.setStatut(TypeStatut.Encours);
+        return ticketRepository.save(ticket);
     }
 
-    //Reponse a un ticket
-    public void repondreAuTicket(Integer id, String reponse) {
-        Ticket ticket = this.ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket non trouvé"));
-        // Logique pour ajouter la réponse (peut-être dans un champ `reponse` que tu devrais ajouter à l'entité Ticket)
-        ticket.setStatut(TypeStatut.Terminer);
-        this.ticketRepository.save(ticket);
+    public List<Ticket> getTicketsByPersonneId(Integer id) {
+        return ticketRepository.findByPersonneId(id);
     }
 
-
-    public List<Ticket> chercher(TypePriorite type) {
-        if(type == null){
-            return this.ticketRepository.findAll();
-        }else{
-            return this.ticketRepository.findByPriorite(type);
-        }
-
+    public Optional<Ticket> getTicketById(Integer id) {
+        return ticketRepository.findById(id);
     }
 
-    public void delete(Integer id) {
-        this.ticketRepository.deleteById(id);
+    public Ticket updateTicket(Ticket ticket) {
+        return ticketRepository.save(ticket);
     }
-}
+
+    public void deleteTicket(Integer id) {
+        ticketRepository.deleteById(id);
+    }
+
+ }

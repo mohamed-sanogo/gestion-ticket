@@ -25,8 +25,7 @@ public class Ticket {
     private TypeCategorie categorie;
     private TypePriorite priorite;
     private TypeStatut statut;
-    private String reponse;
     @ManyToOne(cascade = {PERSIST, MERGE})
-    @JoinColumn(name = "personne_id")
+    @JoinColumn(name = "apprenant_id")
     private Personne personne;
 }

@@ -16,6 +16,6 @@ public class BaseDeConnaissance {
     private Integer id;
     private String titre;
     private String description;
-    private String ressource;
+    private String reponse;
 
 }

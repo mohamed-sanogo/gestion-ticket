@@ -1,6 +1,7 @@
 package com.odk.service;
 
 import com.odk.entity.BaseDeConnaissance;
+import com.odk.entity.Ticket;
 import com.odk.repository.BaseRepository;
 import org.springframework.stereotype.Service;
 
@@ -9,35 +10,21 @@ import java.util.List;
 @Service
 public class BaseDeConnaissanceService {
 
-    private final BaseRepository baseRepository;
+    private final BaseRepository baseDeConnaissanceRepository;
 
-    public BaseDeConnaissanceService(BaseRepository repository) {
-        this.baseRepository = repository;
+    public BaseDeConnaissanceService(BaseRepository baseDeConnaissanceRepository) {
+        this.baseDeConnaissanceRepository = baseDeConnaissanceRepository;
     }
 
-    public BaseDeConnaissance createBase(BaseDeConnaissance base) {
-        return baseRepository.save(base);
+    public void addToBaseDeConnaissance(Ticket ticket, String reponse) {
+        BaseDeConnaissance baseDeConnaissance = new BaseDeConnaissance();
+        baseDeConnaissance.setTitre(ticket.getTitre());
+        baseDeConnaissance.setDescription(ticket.getDescription());
+        baseDeConnaissance.setReponse(reponse);
+        baseDeConnaissanceRepository.save(baseDeConnaissance);
     }
 
-    public List<BaseDeConnaissance> getAllBases() {
-        return baseRepository.findAll();
-    }
-
-    public BaseDeConnaissance getBaseById(Integer id) {
-        return baseRepository.findById(id).orElse(null);
-    }
-
-    public BaseDeConnaissance updateBase(Integer id, BaseDeConnaissance base) {
-        if (baseRepository.existsById(id)) {
-            base.setId(id);
-            return baseRepository.save(base);
-        }
-        return null;
-    }
-
-    public void deleteBase(Integer id) {
-        if (baseRepository.existsById(id)) {
-            baseRepository.deleteById(id);
-        }
+    public List<BaseDeConnaissance> getAll() {
+        return baseDeConnaissanceRepository.findAll();
     }
 }
