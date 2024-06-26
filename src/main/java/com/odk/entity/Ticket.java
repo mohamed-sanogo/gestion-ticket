@@ -27,5 +27,5 @@ public class Ticket {
     private TypeStatut statut;
     @ManyToOne(cascade = {PERSIST, MERGE})
     @JoinColumn(name = "apprenant_id")
-    private Personne personne;
+    private Personne apprenant;
 }

@@ -30,10 +30,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll() // Permettre l'accès à Swagger UI
-                        .requestMatchers("admin", "personne").hasRole("Admin")
-                        .requestMatchers("formateur").hasRole("Admin")
-                        .requestMatchers("apprenant").hasRole("Formateur")
+                        .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("admin", "personne", "formateur").hasRole("Admin")
+                        .requestMatchers("apprenant","newReponse").hasRole("Formateur")
+                        .requestMatchers("createTicket").hasRole("Apprenant")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults());

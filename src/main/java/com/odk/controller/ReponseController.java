@@ -18,7 +18,7 @@ public class ReponseController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path = "createReponse",consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(path = "newReponse",consumes = APPLICATION_JSON_VALUE)
     public Reponse createReponse(@RequestBody Reponse reponse) {
         return reponseService.createReponse(reponse);
     }

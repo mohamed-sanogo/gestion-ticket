@@ -19,7 +19,7 @@ public class Reponse {
     private Integer id;
     private String reponse;
 
-    @ManyToOne(cascade = {PERSIST, MERGE})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticket_id")
     private Ticket ticket;
 

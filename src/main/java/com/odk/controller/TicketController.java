@@ -1,6 +1,8 @@
 package com.odk.controller;
 
+import com.odk.entity.Personne;
 import com.odk.entity.Ticket;
+import com.odk.enums.TypeCategorie;
 import com.odk.enums.TypePriorite;
 import com.odk.enums.TypeRole;
 import com.odk.enums.TypeStatut;
@@ -17,7 +19,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 
 @RestController
-@RequestMapping(path = "ticket", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping( produces = MediaType.APPLICATION_JSON_VALUE)
 public class TicketController {
     private final TicketService ticketService;
 
@@ -32,8 +34,8 @@ public class TicketController {
     }
 
     @GetMapping("/mesTicket/{id}")
-    public List<Ticket> getTicketsByPersonneId(@PathVariable Integer id) {
-        return ticketService.getTicketsByPersonneId(id);
+    public List<Ticket> getTicketsByApprenantId(@PathVariable Personne id) {
+        return ticketService.getTicketsByApprenantId(id);
     }
 
     @GetMapping("/{id}")
@@ -45,6 +47,16 @@ public class TicketController {
     public Ticket updateTicket(@PathVariable Integer id, @RequestBody Ticket ticket) {
         ticket.setId(id);
         return ticketService.updateTicket(ticket);
+    }
+
+    @GetMapping("/categories")
+    public TypeCategorie[] getCategories() {
+        return TypeCategorie.values();
+    }
+
+    @GetMapping("/priorites")
+    public TypePriorite[] getPriorites() {
+        return TypePriorite.values();
     }
 
     @DeleteMapping("/{id}")
