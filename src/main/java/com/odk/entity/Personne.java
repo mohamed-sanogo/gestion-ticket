@@ -28,7 +28,8 @@ public class Personne implements UserDetails {
     private String email;
     private String mdp;
     private Boolean actif=true;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(name = "role_id")
     private Role role;
 
     @Override

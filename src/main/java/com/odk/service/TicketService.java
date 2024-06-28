@@ -23,19 +23,21 @@ public class TicketService {
         this.personneRepository = personneRepository;
     }
 
+    //recuperation du mail de la personne autentifier
+    private String getCurrentUserEmail() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();
+        } else {
+            return principal.toString();
+        }
+    }
 
     public Ticket createTicket(Ticket ticket) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email;
-        if (principal instanceof UserDetails) {
-            email = ((UserDetails) principal).getUsername();
-        } else {
-            email = principal.toString();
-        }
-
+        String email = getCurrentUserEmail();
         Personne apprenant = personneRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Personne non trouvé"));
-
+                .orElseThrow(() -> new RuntimeException("Personne non trouvée"));
+        
         ticket.setApprenant(apprenant);
         ticket.setStatut(TypeStatut.Encours);
         return ticketRepository.save(ticket);

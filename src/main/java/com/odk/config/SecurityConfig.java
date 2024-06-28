@@ -1,7 +1,5 @@
 package com.odk.config;
 
-import com.odk.service.PersonneService;
-import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -31,7 +29,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers("admin", "personne", "formateur").hasRole("Admin")
+                        .requestMatchers( "admin","personne", "formateur").hasRole("Admin")
                         .requestMatchers("apprenant","newReponse").hasRole("Formateur")
                         .requestMatchers("createTicket").hasRole("Apprenant")
                         .anyRequest().authenticated()

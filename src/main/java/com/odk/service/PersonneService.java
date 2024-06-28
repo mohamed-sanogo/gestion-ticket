@@ -22,11 +22,13 @@ public class PersonneService implements UserDetailsService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private RoleRepository roleRepository;
+    private EmailService emailService;
 
-    public PersonneService(PersonneRepository personneRepository, BCryptPasswordEncoder bCryptPasswordEncoder, RoleRepository roleRepository) {
+    public PersonneService(PersonneRepository personneRepository, BCryptPasswordEncoder bCryptPasswordEncoder, RoleRepository roleRepository, EmailService emailService) {
         this.personneRepository = personneRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.roleRepository = roleRepository;
+        this.emailService = emailService;
     }
 
     private void validateEmail(String email) {
@@ -52,9 +54,15 @@ public class PersonneService implements UserDetailsService {
     private Personne createPersonne(Personne personne, TypeRole roleType) {
         validateEmail(personne.getEmail());
         checkIfEmailExists(personne.getEmail());
-        personne.setMdp(bCryptPasswordEncoder.encode(personne.getMdp()));
+        String rawPassword = personne.getMdp();
+        personne.setMdp(bCryptPasswordEncoder.encode(rawPassword));
         personne.setRole(getOrCreateRole(roleType));
-        return personneRepository.save(personne);
+        Personne savedPersonne = personneRepository.save(personne);
+
+        // Envoi des identifiants par email
+        emailService.indentifiantPersonne(personne.getEmail(), personne.getEmail(), rawPassword);
+
+        return savedPersonne;
     }
 
     public void createAdmin(Personne admin) {
