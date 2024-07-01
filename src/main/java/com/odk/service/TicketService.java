@@ -18,9 +18,12 @@ public class TicketService {
 
     private TicketRepository ticketRepository;
     private PersonneRepository personneRepository;
-    public TicketService(TicketRepository ticketRepository, PersonneRepository personneRepository) {
+    private EmailService emailService;
+
+    public TicketService(TicketRepository ticketRepository, PersonneRepository personneRepository, EmailService emailService) {
         this.ticketRepository = ticketRepository;
         this.personneRepository = personneRepository;
+        this.emailService = emailService;
     }
 
     //recuperation du mail de la personne autentifier
@@ -37,7 +40,9 @@ public class TicketService {
         String email = getCurrentUserEmail();
         Personne apprenant = personneRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Personne non trouvée"));
-        
+
+        String message = "Un nouveau ticket a été créé par " + apprenant.getPrenom() + " " + apprenant.getNom() + ".";
+        emailService.emailFormateurs(message);
         ticket.setApprenant(apprenant);
         ticket.setStatut(TypeStatut.Encours);
         return ticketRepository.save(ticket);

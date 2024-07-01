@@ -4,6 +4,7 @@ import com.odk.entity.Personne;
 import com.odk.enums.TypeRole;
 import com.odk.service.PersonneService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -13,7 +14,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class PersonneController {
     private PersonneService personneService;
     public PersonneController(PersonneService personneService) {
@@ -65,7 +66,7 @@ public class PersonneController {
 
     //Controller pour Apprenant
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path = "/Apprenant", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/apprenant", consumes = APPLICATION_JSON_VALUE)
     public void createApprenant(@RequestBody Personne apprenant){
         this.personneService.createApprenant(apprenant);
     }
@@ -75,6 +76,5 @@ public class PersonneController {
         apprenant.setRole(personneService.getOrCreateRole(TypeRole.Apprenant));
         return personneService.updateApprenant(id, apprenant);
     }
-
 
 }

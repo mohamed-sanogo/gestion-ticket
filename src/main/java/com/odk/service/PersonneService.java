@@ -54,13 +54,12 @@ public class PersonneService implements UserDetailsService {
     private Personne createPersonne(Personne personne, TypeRole roleType) {
         validateEmail(personne.getEmail());
         checkIfEmailExists(personne.getEmail());
-        String rawPassword = personne.getMdp();
-        personne.setMdp(bCryptPasswordEncoder.encode(rawPassword));
+        String mdp = personne.getMdp();
+        personne.setMdp(bCryptPasswordEncoder.encode(mdp));
         personne.setRole(getOrCreateRole(roleType));
         Personne savedPersonne = personneRepository.save(personne);
 
-        // Envoi des identifiants par email
-        emailService.indentifiantPersonne(personne.getEmail(), personne.getEmail(), rawPassword);
+        emailService.indentifiantPersonne(personne.getEmail(), personne.getEmail(), mdp);
 
         return savedPersonne;
     }

@@ -6,6 +6,7 @@ import com.odk.repository.BaseRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BaseDeConnaissanceService {
@@ -22,6 +23,18 @@ public class BaseDeConnaissanceService {
         baseDeConnaissance.setDescription(ticket.getDescription());
         baseDeConnaissance.setReponse(reponse);
         baseDeConnaissanceRepository.save(baseDeConnaissance);
+    }
+
+    public BaseDeConnaissance createBase(BaseDeConnaissance base){
+        return baseDeConnaissanceRepository.save(base);
+    }
+
+    public BaseDeConnaissance updateBase(BaseDeConnaissance base){
+        return baseDeConnaissanceRepository.save(base);
+    }
+
+    public void deleteBase(Integer id){
+        baseDeConnaissanceRepository.deleteById(id);
     }
 
     public List<BaseDeConnaissance> getAll() {

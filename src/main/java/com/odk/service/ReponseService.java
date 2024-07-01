@@ -14,18 +14,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ReponseService {
     private final ReponseRepository reponseRepository;
     private final TicketRepository ticketRepository;
     private final BaseDeConnaissanceService baseDeConnaissanceService;
     private PersonneRepository personneRepository;
+    private EmailService emailService;
 
-    public ReponseService(ReponseRepository reponseRepository, TicketRepository ticketRepository, BaseDeConnaissanceService baseDeConnaissanceService, PersonneRepository personneRepository) {
+    public ReponseService(ReponseRepository reponseRepository, TicketRepository ticketRepository, BaseDeConnaissanceService baseDeConnaissanceService, PersonneRepository personneRepository, EmailService emailService) {
         this.reponseRepository = reponseRepository;
         this.ticketRepository = ticketRepository;
         this.baseDeConnaissanceService = baseDeConnaissanceService;
         this.personneRepository = personneRepository;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -51,6 +55,10 @@ public class ReponseService {
 
         baseDeConnaissanceService.addToBaseDeConnaissance(ticket, reponse.getReponse());
 
+        Personne apprenant = ticket.getApprenant();
+        String subjet = "Reponse au Ticket ";
+        String message = "Votre Ticket a été resolue connecter vous pour verifier";
+        emailService.sendEmail(apprenant.getEmail(), subjet, message);
         return reponseRepository.save(reponse);
     }
 }
