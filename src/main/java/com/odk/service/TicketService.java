@@ -2,7 +2,6 @@ package com.odk.service;
 
 import com.odk.entity.Personne;
 import com.odk.entity.Ticket;
-import com.odk.enums.TypePriorite;
 import com.odk.enums.TypeStatut;
 import com.odk.repository.PersonneRepository;
 import com.odk.repository.TicketRepository;
@@ -41,11 +40,14 @@ public class TicketService {
         Personne apprenant = personneRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Personne non trouvée"));
 
-        String message = "Un nouveau ticket a été créé par " + apprenant.getPrenom() + " " + apprenant.getNom() + ".";
-        emailService.emailFormateurs(message);
+
         ticket.setApprenant(apprenant);
         ticket.setStatut(TypeStatut.Encours);
-        return ticketRepository.save(ticket);
+        Ticket t = ticketRepository.save(ticket);
+        String message = "Un nouveau ticket a été créé par " + apprenant.getPrenom() + " " + apprenant.getNom() + ".";
+        emailService.emailFormateurs(message);
+        return t;
+
     }
 
     public List<Ticket> getTicketsByApprenantId(Personne id) {

@@ -28,9 +28,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers( "admin","personne", "formateur").hasRole("Admin")
-                        .requestMatchers("apprenant","newReponse").hasRole("Formateur")
+                        .requestMatchers("/swagger-ui/index.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers( "admin/**","personne", "formateur").hasRole("Admin")
+                        .requestMatchers("apprenant/**","newReponse","base").hasRole("Formateur")
                         .requestMatchers("createTicket").hasRole("Apprenant")
                         .anyRequest().authenticated()
                 )

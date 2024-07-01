@@ -1,6 +1,5 @@
 package com.odk.entity;
 
-import com.odk.enums.TypeRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +20,6 @@ public class Personne implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String nom;
     private String prenom;
     @Column(unique = true)
@@ -31,6 +29,7 @@ public class Personne implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

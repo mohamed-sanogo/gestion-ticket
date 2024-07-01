@@ -6,7 +6,6 @@ import com.odk.repository.BaseRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BaseDeConnaissanceService {

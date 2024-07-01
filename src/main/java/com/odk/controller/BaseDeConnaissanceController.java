@@ -1,6 +1,5 @@
 package com.odk.controller;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.odk.entity.BaseDeConnaissance;
 import com.odk.service.BaseDeConnaissanceService;
 import org.springframework.http.MediaType;
@@ -9,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "base", produces = MediaType.APPLICATION_JSON_VALUE)
 public class BaseDeConnaissanceController {
 
     private final BaseDeConnaissanceService baseDeConnaissanceService;
