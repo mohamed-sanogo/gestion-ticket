@@ -34,6 +34,14 @@ public class PersonneController {
         this.personneService.inscription(personne);
         log.info("inscription");
     }
+    @PostMapping("activation")
+    public void activation(@RequestBody Map<String, String> activation ){
+        //this.personneService.activation(activation);
+    }
+    @PostMapping("deconnexion")
+    public void deconnexion(){
+        this.jwtService.deconnexion();
+    }
 
     @PostMapping(path = "connexion")
     public Map<String, String> connexion(@RequestBody AuthenticationDTO authenticationDTO){

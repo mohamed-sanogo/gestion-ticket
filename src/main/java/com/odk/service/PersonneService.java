@@ -5,14 +5,17 @@ import com.odk.entity.Role;
 import com.odk.enums.TypeRole;
 import com.odk.repository.PersonneRepository;
 import lombok.AllArgsConstructor;
+import org.apache.el.util.Validation;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -43,6 +46,16 @@ public class PersonneService implements UserDetailsService {
 
         personne =  this.personneRepository.save(personne);
     }
+
+    /*public void activation(Map<String, String> activation){
+        Validation validation = this.validationService.LireEnfonctionDuCode(activation.get("code"));
+        if(Instant.now().isAfter(validation.getExpiration())){
+            throw new RuntimeException("Votre code a expiré");
+        }
+        Utilisateur utilisateurActiver = this.utiisateurRepository.findById(validation.getUtilisateur().getId()).orElseThrow(()-> new RuntimeException("utilisateur inconnu"));
+        utilisateurActiiver.setActif(true);
+        this.utilisateurRepository.save(utilisateurActiver);
+    }*/
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
